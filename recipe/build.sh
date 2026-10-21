@@ -10,7 +10,7 @@ if [[ "${host_platform}" == osx-* ]]; then
   # Remove stdlib=libc++; this is the default and errors on C sources.
   export CXXFLAGS="${CXXFLAGS/-stdlib=libc++} -D_LIBCPP_DISABLE_AVAILABILITY"
 else
-  export LDFLAGS="${LDFLAGS} -lrt"
+  export LDFLAGS="${LDFLAGS} -lrt -lm"
 
   # See https://github.com/llvm/llvm-project/issues/85656
   # Otherwise, this will cause linkage errors with a GCC-built abseil
@@ -95,7 +95,7 @@ if [[ "${cuda_compiler_version:-None}" != "None" ]]; then
     # in CUDA device compilation with Clang. Replace typeof with a decltype-based
     # approach that strips references using a template helper.
     GPI_DEVICE_HOST_COMMON="${PREFIX}/include/nccl_device/gin/gpi/gin_gpi_device_host_common.h"
-    if [[ -f "${GPI_DEVICE_HOST_COMMON}" ]]; then
+    if [[ -f "${GPI_DEVICE_HOST_COMMON}" ]] && ! grep -q '__gpi_remove_ref' "${GPI_DEVICE_HOST_COMMON}"; then
       # Insert template helper before #ifndef GPI_ACCESS_ONCE to strip references from decltype
       sed -i 's/^#ifndef GPI_ACCESS_ONCE$/template<typename T> struct __gpi_remove_ref { using type = T; };\
 template<typename T> struct __gpi_remove_ref<T\&> { using type = T; };\
@@ -148,7 +148,6 @@ cat >> .bazelrc <<EOF
 build --crosstool_top=//bazel_toolchain:toolchain
 build --platforms=//bazel_toolchain:target_platform
 build --host_platform=//bazel_toolchain:build_platform
-build --host_linkopt=-lm
 build --extra_toolchains=//bazel_toolchain:cc_cf_toolchain
 build --extra_toolchains=//bazel_toolchain:cc_cf_host_toolchain
 build --verbose_failures
