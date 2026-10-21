@@ -148,6 +148,7 @@ cat >> .bazelrc <<EOF
 build --crosstool_top=//bazel_toolchain:toolchain
 build --platforms=//bazel_toolchain:target_platform
 build --host_platform=//bazel_toolchain:build_platform
+build --host_linkopt=-lm
 build --extra_toolchains=//bazel_toolchain:cc_cf_toolchain
 build --extra_toolchains=//bazel_toolchain:cc_cf_host_toolchain
 build --verbose_failures
