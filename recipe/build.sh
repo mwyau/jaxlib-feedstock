@@ -223,6 +223,13 @@ else
   echo "GCC type_traits not found at ${BUILD_PREFIX}/lib/gcc"
 fi
 
+# Temporary integration validation against XLA main, without downstream XLA archive patches.
+XLA_TEST_ROOT="${SRC_DIR}/xla-main"
+test -f "${XLA_TEST_ROOT}/MODULE.bazel"
+grep -Fq '__clang_major__ < 23' "${XLA_TEST_ROOT}/third_party/raft/clang_cuda_intrinsics.h.patch"
+export JAXCI_XLA_GIT_DIR="${XLA_TEST_ROOT}"
+echo "Testing clean XLA main 8476ae48fd5f490a969d32ec91ff8d29b51e14fb (includes upstream RAFT #51391)"
+
 ${PYTHON} build/build.py build \
     --target_cpu_features default \
     ${EXTRA}
