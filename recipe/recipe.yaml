@@ -10,16 +10,19 @@ package:
 
 source:
   # only pull sources after upstream PyPI release...
-  url: https://github.com/jax-ml/jax/archive/jax-v${{ version }}.tar.gz
-  sha256: 2001f4d627882c8afc5bc3a0f413c471c8a295eb6621bf2572b71188877e73e9
-  patches:
-    - patches/0001-Allow-for-custom-CUDA-build.patch
-    - patches/0002-Adapt-XLA-build-fixes-to-Bzlmod.patch
-    - patches/0003-Fix-CUDA-header-mappings.patch
-    - patches/0004-re-enable-use_fast_cpp_protos-true.patch
-    - patches/0005-Use-CCCL-3.4-for-Clang-CUDA.patch
-    - patches/0006-Include-CUDA-bfloat16-header.patch
-
+  - url: https://github.com/jax-ml/jax/archive/jax-v${{ version }}.tar.gz
+    sha256: 2001f4d627882c8afc5bc3a0f413c471c8a295eb6621bf2572b71188877e73e9
+    patches:
+      - patches/0001-Allow-for-custom-CUDA-build.patch
+      - patches/0002-Adapt-XLA-build-fixes-to-Bzlmod.patch
+      - patches/0003-Fix-CUDA-header-mappings.patch
+      - patches/0004-re-enable-use_fast_cpp_protos-true.patch
+      - patches/0005-Use-CCCL-3.4-for-Clang-CUDA.patch
+      - patches/0006-Include-CUDA-bfloat16-header.patch
+  - git: https://github.com/openxla/xla.git
+    rev: 8476ae48fd5f490a969d32ec91ff8d29b51e14fb
+    target_directory: xla-main
+    submodules: false
 build:
   number: ${{ build if cuda_compiler_version == "None" else build + 200 }}
   string: ${{ "cpu" if cuda_compiler_version == "None" else "cuda" + (cuda_compiler_version | replace('.', '')) }}_py${{ python | version_to_buildstring }}h${{ hash }}_${{ build if cuda_compiler_version == "None" else build + 200 }}
